@@ -1,0 +1,27 @@
+name: Test pipedoc
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  test-pipedoc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build and run pipedoc Docker image
+        run: |
+          docker build -t pipedoc .
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace pipedoc \
+            -f .github/workflows/ci.yml -o docs/ci-pipeline.md
+          cat docs/ci-pipeline.md
+
