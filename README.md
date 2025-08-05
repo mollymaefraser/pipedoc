@@ -23,3 +23,6 @@ flowchart TD
     test[test]
     build --> test
 ```
+
+**Notes**
+* Your main CI file must be called ci.yml
