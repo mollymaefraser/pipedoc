@@ -1,0 +1,34 @@
+name: Generate CI Docs
+on:
+  push:
+    paths:
+      - '.github/workflows/**'
+      - 'cmd/**'
+      - 'internal/**'
+      - 'go.mod'
+      - 'go.sum'
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build pipedoc
+        run: go build -o pipedoc ./cmd/pipedoc/main.go
+
+      - name: Run pipedoc
+        run: ./pipedoc -f .github/workflows/ci.yml -o docs/ci-pipeline.md
+
+      - name: Commit & push docs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/ci-pipeline.md docs/ci-pipeline.mmd
+          git commit -m "Update CI documentation" || echo "No changes to commit"
+          git push
